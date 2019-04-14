@@ -1,56 +1,42 @@
 #pragma once
 #include <stdexcept>
-#include <vector>
+#include <array>
 #include <cmath>
 
-template<typename T>
+template<typename T, int Size>
 class CMyVektor
 {
 public:
-	template<typename T>
-	friend CMyVektor<T> operator + (const CMyVektor<T>& a, const CMyVektor<T>& b);
-	template<typename T>
-	friend CMyVektor<T> operator * (double lambda, const CMyVektor<T>& a);
-	template<typename T>
-	friend CMyVektor<T> gradient(const CMyVektor<T>& x, double(*funktion)(const CMyVektor<T>& x));
-	template<typename T>
-	friend void gradientSteps(CMyVektor<T> x, double(*funktion)(const CMyVektor<T>& x), double lambda);
-	template<typename T>
-	friend std::ostream& operator << (std::ostream& ostream, const CMyVektor<T>& vec);
+	template<typename T, int Size>
+	friend CMyVektor<T, Size> operator + (const CMyVektor<T, Size>& a, const CMyVektor<T, Size>& b);
+	template<typename T, int Size>
+	friend CMyVektor<T, Size> operator * (double lambda, const CMyVektor<T, Size>& a);
+	template<typename T, int Size>
+	friend CMyVektor<T, Size> gradient(const CMyVektor<T, Size>& x, double(*funktion)(const CMyVektor<T, Size>& x));
+	template<typename T, int Size>
+	friend void gradientSteps(const CMyVektor<T, Size>& aX, double(*funktion)(const CMyVektor<T, Size>& x), double lambda);
+	template<typename T, int Size>
+	friend std::ostream& operator << (std::ostream& ostream, const CMyVektor<T, Size>& vec);
 
-	CMyVektor(int dimension) : m_Dimension(dimension)
-	{
-		m_Vectors = new T[dimension];
-	}
+	CMyVektor() {}
 
-	CMyVektor(const std::vector<T>& vector)
-	{
-		m_Dimension = vector.size();
-		m_Vectors = new T[m_Dimension];
-		for (int i = 0; i < m_Dimension; ++i)
+	CMyVektor(const std::array<T, Size>& vector)
+	{		
+		for (int i = 0; i < Size; ++i)
 			m_Vectors[i] = vector[i];
-	}
-
-	~CMyVektor()
-	{
-		delete[] m_Vectors;
-		m_Vectors = nullptr;
-	}
+	}	
 	
-	CMyVektor(const CMyVektor& vec)
-	{
-		m_Dimension = vec.m_Dimension;
-		m_Vectors = new T[m_Dimension];
-		for (int i = 0; i < m_Dimension; ++i)
+	CMyVektor(const CMyVektor<T, Size>& vec)
+	{	
+		for (int i = 0; i < Size; ++i)
 			m_Vectors[i] = vec[i];
 	}
 
-	inline int GetDimension() const { return m_Dimension; }
+	inline int GetDimension() const { return Size; }
 
-	
 	T operator [] (int index) const
 	{
-		if (index > m_Dimension || index < 0)
+		if (index > Size || index < 0)
 		{
 			throw std::out_of_range("received index out of range");
 		}
@@ -58,24 +44,16 @@ public:
 		return m_Vectors[index];
 	}
 	
-	CMyVektor<T> & operator = (const CMyVektor<T>& vec)
-	{
-		if (m_Vectors)
-		{
-			delete m_Vectors;
-			m_Vectors = nullptr;
-		}			
-
-		m_Dimension = vec.m_Dimension;
-		m_Vectors = new T[m_Dimension];
-		for (int i = 0; i < m_Dimension; ++i)
+	CMyVektor<T, Size> & operator = (const CMyVektor<T, Size>& vec)
+	{	
+		for (int i = 0; i < Size; ++i)
 			m_Vectors[i] = vec[i];
 		return *this;
 	}
 
 	T& operator [] (int index)
 	{
-		if (index > m_Dimension || index < 0)
+		if (index > Size || index < 0)
 		{
 			throw std::out_of_range("received index out of range");
 		}			
@@ -86,67 +64,62 @@ public:
 	double Length() const
 	{
 		double len = .0;
-		for (int i = 0; i < m_Dimension; ++i)		
+		for (int i = 0; i < Size; ++i)
 			len += std::pow(m_Vectors[i], 2);
 		return std::sqrt(len);		
 	}
 
-private:
-	int m_Dimension;
-	T* m_Vectors;
+private:	
+	std::array<T, Size> m_Vectors;
 };
 
-template<typename T>
-CMyVektor<T> operator + (const CMyVektor<T>& a, const CMyVektor<T>& b)
+template<typename T, int Size>
+CMyVektor<T, Size> operator + (const CMyVektor<T, Size>& a, const CMyVektor<T, Size>& b)
 {
-	if (a.GetDimension() != b.GetDimension())
-	{
-		throw std::exception("Dimensions are not the same!");
-	}
-
-	CMyVektor<T> newVector(a.GetDimension());
-	for (int i = 0; i < newVector.GetDimension(); ++i)
+	CMyVektor<T, Size> newVector;
+	for (int i = 0; i < Size; ++i)
 		newVector[i] = a[i] + b[i];
 	return newVector;
 }
 
-template<typename T>
-CMyVektor<T> operator * (double lambda, const CMyVektor<T>& a)
+template<typename T, int Size>
+CMyVektor<T, Size> operator * (double lambda, const CMyVektor<T, Size>& a)
 {
-	CMyVektor<T> newVector(a.GetDimension());
-	for (int i = 0; i < newVector.GetDimension(); ++i)
+	CMyVektor<T, Size> newVector;
+	for (int i = 0; i < Size; ++i)
 		newVector[i] = a[i] * lambda;
 	return newVector;
 }
 
-template<typename T>
-std::ostream& operator << (std::ostream& stream, const CMyVektor<T>& vec)
+template<typename T, int Size>
+std::ostream& operator << (std::ostream& stream, const CMyVektor<T, Size>& vec)
 {
 	std::cout << "( ";
-	for (int i = 0; i < vec.m_Dimension; ++i)
+	for (int i = 0; i < Size; ++i)
 		std::cout << vec[i] << ";";
 	std::cout << " )";
 	return stream;
 }
 
-template<typename T>
-CMyVektor<T> gradient(const CMyVektor<T>& x, double(*funktion)(const CMyVektor<T>& x))
+template<typename T, int Size>
+CMyVektor<T, Size> gradient(const CMyVektor<T, Size>& x, double(*funktion)(const CMyVektor<T, Size>& x))
 {
-	CMyVektor<T> gradientVec(x.GetDimension());
+	CMyVektor<T, Size> gradientVec;
 	const double h = 0.00000001; // 10 ^ -8
 	const double rightTerm = funktion(x);
-	for (int i = 0; i < gradientVec.GetDimension(); ++i)
+	for (int i = 0; i < Size; ++i)
 	{
-		CMyVektor<T> tmpVec(x);
+		CMyVektor<T, Size> tmpVec(x);
 		tmpVec[i] += h;
 		gradientVec[i] = (funktion(tmpVec) - rightTerm) / h;
 	}
 	return gradientVec;
 }
 
-template<typename T>
-void gradientSteps(CMyVektor<T> x, double(*funktion)(const CMyVektor<T>& x), double lambda = 1.0)
+template<typename T, int Size>
+void gradientSteps(const CMyVektor<T, Size>& aX, double(*funktion)(const CMyVektor<T, Size>& x), double lambda = 1.0)
 {
+	CMyVektor<T, Size> x(aX);
 	bool bAbort = false;
 	for (int i = 0; i < 25; ++i)
 	{		
@@ -154,12 +127,12 @@ void gradientSteps(CMyVektor<T> x, double(*funktion)(const CMyVektor<T>& x), dou
 		std::cout << "x = " << x << std::endl;
 		std::cout << "lambda = " << lambda << std::endl;		
 		std::cout << "f(X) = " << funktion(x) << std::endl;
-		CMyVektor<T> gradientVec = gradient(x, funktion);
+		CMyVektor<T, Size> gradientVec = gradient(x, funktion);
 		std::cout << "grad f(x) = " << gradientVec << std::endl;
 		const double gradientVecProduct = gradientVec.Length();
 		std::cout << "||grad f(x)|| = " << std::abs(gradientVecProduct) << std::endl << std::endl;
 
-		CMyVektor<T> newVec(x + lambda * gradientVec);
+		CMyVektor<T, Size> newVec(x + lambda * gradientVec);
 		std::cout << "x_neu = " << newVec << std::endl;
 		const double newVecProduct = funktion(newVec);
 		std::cout << "f(x_neu) = " << newVecProduct << std::endl << std::endl;
@@ -167,7 +140,7 @@ void gradientSteps(CMyVektor<T> x, double(*funktion)(const CMyVektor<T>& x), dou
 		if (newVecProduct > funktion(x))
 		{		
 			std::cout << "Test mit doppelter Schrittweite (lambda = " << 2 * lambda << "):" << std::endl;
-			CMyVektor<T> testVec(x + (2 * lambda) * gradient(x, funktion));
+			CMyVektor<T, Size> testVec(x + (2 * lambda) * gradient(x, funktion));
 			std::cout << "x_test = " << testVec << std::endl;
 			const double testVecProduct = funktion(testVec);
 			std::cout << "f(x_test) = " << testVecProduct << std::endl;
