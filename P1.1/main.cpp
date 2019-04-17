@@ -5,9 +5,7 @@
 template<typename T, int Size>
 double calcGradient(const CMyVektor<T, Size>& x)
 {
-	double result = 0.0;
-	result += x[0] + std::pow(x[1], 2) + std::pow(x[2], 3);
-	return result;
+	return x[0] + std::pow(x[1], 2) + std::pow(x[2], 3);
 }
 
 template<typename T, int Size>
@@ -32,14 +30,14 @@ int main()
 	assert(vec4[0] == 2.0 && vec4[1] == 4.0 && vec4[2] == 4.0);
 	assert(vec2.Length() == 3.0);	
 	
-	CMyVektor<double, 3> test0({ 3.0, 4.0, 5.0 });
-	CMyVektor<double, 3> gradientVec = gradient(test0, calcGradient);
+	//CMyVektor<double, 3> test0({ 3.0, 4.0, 5.0 });
+	//CMyVektor<double, 3> gradientVec = gradient(test0, calcGradient);
 
-	CMyVektor<double, 3> test1({ 0.2, -2.1});	
+	CMyVektor<double, 2> test1({ 0.2, -2.1});		
 	gradientSteps(test1, f);
 
-	//CMyVektor<double, 3> test2({ .0, .0, .0 });
-	//gradientSteps(test2, g, .1);
+	CMyVektor<double, 3> test2({ .0, .0, .0 });
+	gradientSteps(test2, g, .1);
 
 	system("PAUSE");
 }

@@ -7,36 +7,20 @@ template<typename T, int Size>
 class CMyVektor
 {
 public:
-	template<typename T, int Size>
-	friend CMyVektor<T, Size> operator + (const CMyVektor<T, Size>& a, const CMyVektor<T, Size>& b);
-	template<typename T, int Size>
-	friend CMyVektor<T, Size> operator * (double lambda, const CMyVektor<T, Size>& a);
-	template<typename T, int Size>
-	friend CMyVektor<T, Size> gradient(const CMyVektor<T, Size>& x, double(*funktion)(const CMyVektor<T, Size>& x));
-	template<typename T, int Size>
-	friend void gradientSteps(const CMyVektor<T, Size>& aX, double(*funktion)(const CMyVektor<T, Size>& x), double lambda);
-	template<typename T, int Size>
-	friend std::ostream& operator << (std::ostream& ostream, const CMyVektor<T, Size>& vec);
-
 	CMyVektor() {}
 
-	CMyVektor(const std::array<T, Size>& vector)
-	{		
-		for (int i = 0; i < Size; ++i)
-			m_Vectors[i] = vector[i];
-	}	
+	CMyVektor(const std::array<T, Size>& vector) : m_Vectors(vector) {}	
 	
 	CMyVektor(const CMyVektor<T, Size>& vec)
-	{	
-		for (int i = 0; i < Size; ++i)
-			m_Vectors[i] = vec[i];
+	{			
+		m_Vectors = vec.m_Vectors;
 	}
 
 	inline int GetDimension() const { return Size; }
 
 	T operator [] (int index) const
 	{
-		if (index > Size || index < 0)
+		if (index >= Size || index < 0)
 		{
 			throw std::out_of_range("received index out of range");
 		}
@@ -53,7 +37,7 @@ public:
 
 	T& operator [] (int index)
 	{
-		if (index > Size || index < 0)
+		if (index >= Size || index < 0)
 		{
 			throw std::out_of_range("received index out of range");
 		}			
@@ -102,22 +86,22 @@ std::ostream& operator << (std::ostream& stream, const CMyVektor<T, Size>& vec)
 }
 
 template<typename T, int Size>
-CMyVektor<T, Size> gradient(const CMyVektor<T, Size>& x, double(*funktion)(const CMyVektor<T, Size>& x))
+CMyVektor<T, Size> gradient(const CMyVektor<T, Size>& x, double(*function)(const CMyVektor<T, Size>& x))
 {
 	CMyVektor<T, Size> gradientVec;
 	const double h = 0.00000001; // 10 ^ -8
-	const double rightTerm = funktion(x);
+	const double rightTerm = function(x);
 	for (int i = 0; i < Size; ++i)
 	{
 		CMyVektor<T, Size> tmpVec(x);
 		tmpVec[i] += h;
-		gradientVec[i] = (funktion(tmpVec) - rightTerm) / h;
+		gradientVec[i] = (function(tmpVec) - rightTerm) / h;
 	}
 	return gradientVec;
 }
 
 template<typename T, int Size>
-void gradientSteps(const CMyVektor<T, Size>& aX, double(*funktion)(const CMyVektor<T, Size>& x), double lambda = 1.0)
+void gradientSteps(const CMyVektor<T, Size>& aX, double(*function)(const CMyVektor<T, Size>& x), double lambda = 1.0)
 {
 	CMyVektor<T, Size> x(aX);
 	bool bAbort = false;
@@ -126,25 +110,24 @@ void gradientSteps(const CMyVektor<T, Size>& aX, double(*funktion)(const CMyVekt
 		std::cout << "Schritt " << i << ":" << std::endl;
 		std::cout << "x = " << x << std::endl;
 		std::cout << "lambda = " << lambda << std::endl;		
-		std::cout << "f(X) = " << funktion(x) << std::endl;
-		CMyVektor<T, Size> gradientVec = gradient(x, funktion);
-		std::cout << "grad f(x) = " << gradientVec << std::endl;
-		const double gradientVecProduct = gradientVec.Length();
-		std::cout << "||grad f(x)|| = " << std::abs(gradientVecProduct) << std::endl << std::endl;
+		std::cout << "f(X) = " << function(x) << std::endl;
+		CMyVektor<T, Size> gradientVec = gradient(x, function);
+		std::cout << "grad f(x) = " << gradientVec << std::endl;		
+		std::cout << "||grad f(x)|| = " << gradientVec.Length() << std::endl << std::endl;
 
 		CMyVektor<T, Size> newVec(x + lambda * gradientVec);
 		std::cout << "x_neu = " << newVec << std::endl;
-		const double newVecProduct = funktion(newVec);
-		std::cout << "f(x_neu) = " << newVecProduct << std::endl << std::endl;
+		const double newVecFunc = function(newVec);
+		std::cout << "f(x_neu) = " << newVecFunc << std::endl << std::endl;
 
-		if (newVecProduct > funktion(x))
+		if (newVecFunc > function(x))
 		{		
 			std::cout << "Test mit doppelter Schrittweite (lambda = " << 2 * lambda << "):" << std::endl;
-			CMyVektor<T, Size> testVec(x + (2 * lambda) * gradient(x, funktion));
+			CMyVektor<T, Size> testVec(x + (2 * lambda) * gradient(x, function));
 			std::cout << "x_test = " << testVec << std::endl;
-			const double testVecProduct = funktion(testVec);
-			std::cout << "f(x_test) = " << testVecProduct << std::endl;
-			if (testVecProduct > funktion(newVec))
+			const double testVecFunc = function(testVec);
+			std::cout << "f(x_test) = " << testVecFunc << std::endl;
+			if (testVecFunc > function(newVec))
 			{
 				x = testVec;
 				lambda *= 2;
@@ -157,7 +140,7 @@ void gradientSteps(const CMyVektor<T, Size>& aX, double(*funktion)(const CMyVekt
 			}
 			
 		}
-		else if (funktion(newVec) <= funktion(x))
+		else if (function(newVec) <= function(x))
 		{
 			double newXProduct = .0;
 			do
@@ -166,15 +149,15 @@ void gradientSteps(const CMyVektor<T, Size>& aX, double(*funktion)(const CMyVekt
 				std::cout << "halbiere Schrittweite (lambda = " << lambda << "):" << std::endl;
 				newVec = (x + lambda * gradientVec);
 				std::cout << "x_neu = " << newVec << std::endl;
-				newXProduct = funktion(newVec);
+				newXProduct = function(newVec);
 				std::cout << "f(x_neu) = " << newXProduct << std::endl << std::endl;
 
-			} while (newXProduct <= funktion(x));
+			} while (newXProduct <= function(x));
 			x = newVec;
 		}
 
 		std::cout << std::endl;
-		if (std::abs(gradient(x, funktion).Length()) < 0.00001)
+		if (gradient(x, function).Length() < 0.00001) // 10 ^ -5
 		{
 			bAbort = true;
 			break;
@@ -185,7 +168,7 @@ void gradientSteps(const CMyVektor<T, Size>& aX, double(*funktion)(const CMyVekt
 	std::cout << "Ende wegen ";
 	if (bAbort)
 	{
-		std::cout << " || grad f(x) || < " << std::abs(gradient(x, funktion).Length());		
+		std::cout << " || grad f(x) || < " << gradient(x, function).Length();		
 	}
 	else
 	{
@@ -195,7 +178,7 @@ void gradientSteps(const CMyVektor<T, Size>& aX, double(*funktion)(const CMyVekt
 	std::cout << " bei" << std::endl
 	<< "x = " << x << std::endl
 	<< "lambda = " << lambda << std::endl
-	<< "f(X) = " << funktion(x) << std::endl
-	<< "grad f(x) = " << gradient(x, funktion) << std::endl
-	<< "||grad f(x)|| = " << std::abs(gradient(x, funktion).Length()) << std::endl << std::endl;
+	<< "f(X) = " << function(x) << std::endl
+	<< "grad f(x) = " << gradient(x, function) << std::endl
+	<< "||grad f(x)|| = " << gradient(x, function).Length() << std::endl << std::endl;
 }
