@@ -16,7 +16,7 @@ public:
 		m_matrix = { 0 };
 	}
 
-	CMyMatrix(std::array< std::array<T, Row>, Column> matrix) : m_matrix(matrix) {}
+	CMyMatrix(std::array< std::array<T, Column>, Row> matrix) : m_matrix(matrix) {}
 	
 	T Get(int rowId, int columnId) const
 	{
@@ -45,16 +45,16 @@ public:
 	void print() const
 	{
 		std::cout << "Matrix" << std::endl;
-		for (unsigned int i = 0; i < Column; ++i)
+		for (unsigned int i = 0; i < Row; ++i)
 		{
-			for (unsigned int j = 0; j < Row; ++j)
+			for (unsigned int j = 0; j < Column; ++j)
 				std::cout << m_matrix[i][j] << " ";
 			std::cout << std::endl;
 		}			
 	}
 
 private:
-	std::array<std::array<T, Row>, Column> m_matrix;
+	std::array<std::array<T, Column>, Row> m_matrix;
 
 };
 
@@ -75,7 +75,7 @@ CMyMatrix<T, MatrixRow, MatrixColumn> jacobi(const CMyVektor<T, MatrixColumn>& x
 	CMyMatrix<T, MatrixRow, MatrixColumn> jacobiMatrix;
 	const double h = 1e-4; // 10 ^ -4
 	CMyVektor<T, FVectorSize> f = function(x);	
-	for (unsigned int i = 0; i < MatrixColumn; ++i)
+	for (unsigned int i = 0; i < MatrixRow; ++i)
 	{
 		CMyVektor<T, MatrixColumn> tmpVec(x);
 		tmpVec[i] += h;
