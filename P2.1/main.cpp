@@ -1,5 +1,6 @@
 #include <iostream>
 #include <array>
+#include <assert.h>
 #include <cmath>
 #include "CMyMatrix.h"
 #include "CMyVektor.h"
@@ -27,18 +28,22 @@ int main()
 {
 	CMyVektor<int, 3> vec{ { 1, 0, 4 } };
 	std::array<std::array<int, 3>, 2> matArray{ { { 3, 2, 1 }, { 1, 0, 2 } } };
-	CMyMatrix<int, 2, 3> matrix (matArray);
-	//matrix.print();
-	CMyVektor<int, 2> result = matrix * vec;
-
-	std::array<std::array<double, 2>, 2> mat2x2Array{ { { 1, 2}, {4, 5} } };
+	CMyMatrix<int, 2, 3> matrix (matArray);	
+	const auto& result = matrix * vec;
+	assert(result[0] == 7 && result[1] == 9);
+	
+	std::array<std::array<double, 2>, 2> mat2x2Array{ { { -3, 5}, {1, -1} } };
 	CMyMatrix<double, 2, 2> mat2x2(mat2x2Array);
-	auto test = mat2x2.invers();
-	//test.print();
+	const auto& inverseTest = mat2x2.invers();
+	assert(inverseTest.Get(0, 0) == 0.5 &&
+		inverseTest.Get(0, 1) == 2.5 &&
+		inverseTest.Get(1, 0) == 0.5 &&
+		inverseTest.Get(1, 1) == 1.5);
+	
 
 	CMyVektor<double, 4> start { { 1, 2, 0, 3 } };
-	CMyMatrix<double, 3, 4> jacobiMat = jacobi<double, 3, 4, 3>(start, f);
-	//jacobiMat.print();
+	CMyMatrix<double, 3, 4> jacobiMat = jacobi<double, 4, 3>(start, f);
+	jacobiMat.print();
 
 	CMyVektor<double, 2> startNewton{ { 1, 1 } };
 	newtonIteration<double, 2>(startNewton, newton);

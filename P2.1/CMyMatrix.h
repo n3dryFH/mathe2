@@ -69,19 +69,19 @@ CMyVektor<T, Row> operator * (const CMyMatrix<T, Row, Column> matrix, const CMyV
 	return newVector;
 }
 
-template<typename T, int MatrixRow, int MatrixColumn, int FVectorSize>
-CMyMatrix<T, MatrixRow, MatrixColumn> jacobi(const CMyVektor<T, MatrixColumn>& x, CMyVektor<T, FVectorSize> (*function) (const CMyVektor<T, MatrixColumn>& x))
+template<typename T, int FVectorSize, int DerivedVectorSize>
+CMyMatrix<T, DerivedVectorSize, FVectorSize> jacobi(const CMyVektor<T, FVectorSize>& x, CMyVektor<T, DerivedVectorSize> (*function) (const CMyVektor<T, FVectorSize>& x))
 {
-	CMyMatrix<T, MatrixRow, MatrixColumn> jacobiMatrix;
+	CMyMatrix<T, DerivedVectorSize, FVectorSize> jacobiMatrix;
 	const double h = 1e-4; // 10 ^ -4
-	CMyVektor<T, FVectorSize> f = function(x);	
-	for (unsigned int i = 0; i < MatrixRow; ++i)
+	CMyVektor<T, DerivedVectorSize> f = function(x);
+	for (unsigned int i = 0; i < FVectorSize; ++i)
 	{
-		CMyVektor<T, MatrixColumn> tmpVec(x);
+		CMyVektor<T, FVectorSize> tmpVec(x);
 		tmpVec[i] += h;
-		CMyVektor<T, FVectorSize> fx = (function(tmpVec) - f) / h;
-		for (unsigned int j = 0; j < FVectorSize; ++j)
-			jacobiMatrix.Set(i, j, fx[j]);		
+		CMyVektor<T, DerivedVectorSize> fx = (function(tmpVec) - f) / h;
+		for (unsigned int j = 0; j < DerivedVectorSize; ++j)
+			jacobiMatrix.Set(j, i, fx[j]);		
 	}
 	
 	return jacobiMatrix;
@@ -102,13 +102,13 @@ void newtonIteration(const CMyVektor<T, VectorSize>& aX, CMyVektor<T, VectorSize
 	
 		CMyMatrix<T, VectorSize, VectorSize> xJacobiMatrix = jacobi<T, VectorSize, VectorSize>(x, function);
 		std::cout << "\tf'(x) = " << std::endl
-			<< "\t\t( " << xJacobiMatrix.Get(0, 0) << "; " << xJacobiMatrix.Get(1, 0) << std::endl
-			<< "\t\t" << xJacobiMatrix.Get(0, 1) << "; " << xJacobiMatrix.Get(1, 1) << " )" << std::endl;
+			<< "\t\t( " << xJacobiMatrix.Get(0, 0) << "; " << xJacobiMatrix.Get(0, 1) << std::endl
+			<< "\t\t" << xJacobiMatrix.Get(1, 0) << "; " << xJacobiMatrix.Get(1, 1) << " )" << std::endl;
 
 		CMyMatrix<T, VectorSize, VectorSize> xJacobiMatrixInverse = xJacobiMatrix.invers();
 		std::cout << "\t(f'(x))^(-1) = " << std::endl
-			<< "\t\t( " << xJacobiMatrixInverse.Get(0, 0) << "; " << xJacobiMatrixInverse.Get(1, 0) << std::endl
-			<< "\t\t" << xJacobiMatrixInverse.Get(0, 1) << "; " << xJacobiMatrixInverse.Get(1, 1) << " )" << std::endl;
+			<< "\t\t( " << xJacobiMatrixInverse.Get(0, 0) << "; " << xJacobiMatrixInverse.Get(0, 1) << std::endl
+			<< "\t\t" << xJacobiMatrixInverse.Get(1, 0) << "; " << xJacobiMatrixInverse.Get(1, 1) << " )" << std::endl;
 
 		CMyVektor<T, VectorSize> deltaX = xJacobiMatrixInverse * fx;
 		deltaX = -1 * deltaX;
