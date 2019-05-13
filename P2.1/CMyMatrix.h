@@ -9,7 +9,7 @@ class CMyMatrix
 {
 public:
 	template<typename T, int Row, int Column>
-	friend CMyVektor<T, Column> operator*(const CMyMatrix<T, Row, Column> matrix, const CMyVektor<T, Column> vector);
+	friend CMyVektor<T, Row> operator*(const CMyMatrix<T, Row, Column> matrix, const CMyVektor<T, Column> vector);
 	
 	CMyMatrix() 
 	{
@@ -59,12 +59,12 @@ private:
 };
 
 template<typename T, int Row, int Column>
-CMyVektor<T, Column> operator*(const CMyMatrix<T, Row, Column> matrix, const CMyVektor<T, Column> vector)
+CMyVektor<T, Row> operator * (const CMyMatrix<T, Row, Column> matrix, const CMyVektor<T, Column> vector)
 {
 	CMyVektor<T, Row> newVector;
-	for (unsigned int column = 0; column < Column; ++column)
-		for (unsigned int row = 0; row < Row; ++row)		
-			newVector[column] += matrix.Get(row, column) * vector[row];
+	for (unsigned int row = 0; row < Row; ++row)
+		for (unsigned int column = 0; column < Column; ++column)		
+			newVector[row] += matrix.Get(row, column) * vector[column];
 
 	return newVector;
 }
