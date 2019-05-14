@@ -16,7 +16,7 @@ public:
 		m_matrix = { 0 };
 	}
 
-	CMyMatrix(std::array< std::array<T, Column>, Row> matrix) : m_matrix(matrix) {}
+	CMyMatrix(std::array<std::array<T, Column>, Row> matrix) : m_matrix(matrix) {}
 	
 	T Get(int rowId, int columnId) const
 	{
@@ -83,9 +83,9 @@ CMyMatrix<T, FReturnVectorSize, FArgVectorSize> jacobi(const CMyVektor<T, FArgVe
 	{
 		FArgVector tmpVec(x);
 		tmpVec[i] += h;
-		const FResultVector fx = (function(tmpVec) - f) / h;
+		const FResultVector derivedFx = (function(tmpVec) - f) / h;
 		for (unsigned int j = 0; j < FReturnVectorSize; ++j)
-			jacobiMatrix.Set(j, i, fx[j]);		
+			jacobiMatrix.Set(j, i, derivedFx[j]);		
 	}	
 	return jacobiMatrix;
 }
