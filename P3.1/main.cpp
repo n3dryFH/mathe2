@@ -7,8 +7,8 @@
 CMyVektor<double, 2> DGLSystem(const CMyVektor<double, 2>& y, double x)
 {
 	CMyVektor<double, 2> result;
-	result[0] = 2 * y[1] - x * y[0];
-	result[1] = y[0] * y[1] - 2 * (x*x*x);
+	result[0] = 2 * y[1] - x * y[0]; // y'1 = 2 * y2 - x * y1
+	result[1] = y[0] * y[1] - 2 * (x*x*x); // y'2 = y1 * y2 - 2*x^3
 	return result;
 }
 
@@ -23,18 +23,16 @@ int main()
 	CMyVektor<double, 2> startPos({ 0, 1 });
 	C_DGLSolver<double, 2> dglSystemSolver(DGLSystem);
 	dglSystemSolver.Euler(0, 2, 100, startPos);
-	dglSystemSolver.Heun(0, 2, 100, startPos);
+	//dglSystemSolver.Heun(0, 2, 100, startPos);
 	
-
-	
-	C_DGLSolver<double, 3> dglSolverNterOrdnung(DGLSystemDritterOrdnung);
+	/*C_DGLSolver<double, 3> dglSolverNterOrdnung(DGLSystemDritterOrdnung);
 	std::array<int, 4> steps{ 10, 100, 1000, 10000 };
 	CMyVektor<double, 3> startPosNterOrdnung({ 1, -1, 2 });
 	for (int i = 0; i < steps.size(); ++i)
 	{
 		dglSolverNterOrdnung.Euler(1, 2, steps[i], startPosNterOrdnung);
 		dglSolverNterOrdnung.Heun(1, 2, steps[i], startPosNterOrdnung);
-	}
+	}*/
 
 	system("PAUSE");
 }

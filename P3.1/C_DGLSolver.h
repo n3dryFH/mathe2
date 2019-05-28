@@ -94,6 +94,7 @@ private:
 		if (m_fDGLSystem)		
 			return m_fDGLSystem(y, x);		
 
+		// DGL Umformung in 1. Ordnung
 		assert(m_fDGLnterOrdnung != nullptr);
 		CMyVektor<T, Size> derivedY;
 		for (int i = 0; i < Size - 1; ++i)		
