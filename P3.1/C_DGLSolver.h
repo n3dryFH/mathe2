@@ -22,16 +22,16 @@ public:
 
 		for (int i = 0; i < steps; ++i)
 		{
-			CMyVektor<T, Size> derivedY = ableitungen(y, x);
-			y = y + (h * derivedY);
-			x += h;
+			CMyVektor<T, Size> slope = ableitungen(y, x);
 			if (m_fDGLSystem)
 			{
 				std::cout << "Schritt " << i << ":" << std::endl;
 				std::cout << "\t\tx = " << x << std::endl;
 				std::cout << "\t\ty = (" << y[0] << "; " << y[1] << ")" << std::endl;
-				std::cout << "\t\ty' = (" << derivedY[0] << "; " << derivedY[1] << ")" << std::endl << std::endl;
-			}			
+				std::cout << "\t\ty' = (" << slope[0] << "; " << slope[1] << ")" << std::endl << std::endl;
+			}						
+			y = y + (h * slope);			
+			x += h;			
 		}		
 
 		if (m_fDGLnterOrdnung)
@@ -57,18 +57,18 @@ public:
 
 		for (int i = 0; i < steps; ++i)
 		{
-			CMyVektor<T, Size> derivedY = ableitungen(y, x);
-			CMyVektor<T, Size> yWithStep = y + (h * derivedY);
-			CMyVektor<T, Size> steigung = ableitungen(yWithStep, x + h);
-			CMyVektor<T, Size> middle = .5 * (derivedY + steigung);
+			CMyVektor<T, Size> slopeY1 = ableitungen(y, x);
+			CMyVektor<T, Size> yWithStep = y + (h * slopeY1);
+			CMyVektor<T, Size> slopeY2 = ableitungen(yWithStep, x + h);
+			CMyVektor<T, Size> middle = .5 * (slopeY1 + slopeY2);
 			if (m_fDGLSystem)
 			{
 				std::cout << "Schritt " << i << ":" << std::endl;
 				std::cout << "\t\tx = " << x << std::endl;
 				std::cout << "\t\ty = (" << y[0] << "; " << y[1] << ")" << std::endl;
-				std::cout << "\t\ty'_orig = (" << derivedY[0] << "; " << derivedY[1] << ")" << std::endl << std::endl;
+				std::cout << "\t\ty'_orig = (" << slopeY1[0] << "; " << slopeY1[1] << ")" << std::endl << std::endl;
 				std::cout << "\t\ty_Test = (" << yWithStep[0] << "; " << yWithStep[1] << ")" << std::endl;
-				std::cout << "\t\ty'_Test = (" << steigung[0] << "; " << steigung[1] << ")" << std::endl << std::endl;
+				std::cout << "\t\ty'_Test = (" << slopeY2[0] << "; " << slopeY2[1] << ")" << std::endl << std::endl;
 				std::cout << "\t\ty'_Mittel = (" << middle[0] << "; " << middle[1] << ")" << std::endl << std::endl;
 			}			
 
