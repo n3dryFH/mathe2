@@ -20,7 +20,6 @@ std::vector<CKomplex> transform(const std::vector<CKomplex>& komplexVec, bool hi
 			transformed.at(n) = transformed.at(n) + komplexVec.at(k) * CKomplex((transformFactor * PI * k * n) / N);
 		transformed.at(n) = (1 / std::sqrt(N)) * transformed.at(n);
 	}
-
 	return transformed;
 }
 
