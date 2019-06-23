@@ -1,23 +1,25 @@
 #pragma once
+
+#define _USE_MATH_DEFINES
+
 #include <vector>
 #include <fstream>
 #include <cassert>
+#include <math.h>
 #include "CKomplex.h"
 
 using namespace std;
 
-const double PI = 3.141592653589793238463;
-
 std::vector<CKomplex> transform(const std::vector<CKomplex>& komplexVec, bool hinTransformation)
 {
 	std::vector<CKomplex> transformed(komplexVec.size());
-	const double transformFactor = hinTransformation ? -2 : 2;
+	const double direction = hinTransformation ? -2 : 2;
 	const int N = komplexVec.size();
 
 	for (int n = 0; n < N; ++n)
 	{
 		for (int k = 0; k < N; ++k)		
-			transformed.at(n) = transformed.at(n) + komplexVec.at(k) * CKomplex((transformFactor * PI * k * n) / N);
+			transformed.at(n) = transformed.at(n) + komplexVec.at(k) * CKomplex((direction * M_PI * k * n) / N);
 		transformed.at(n) = (1 / std::sqrt(N)) * transformed.at(n);
 	}
 	return transformed;
